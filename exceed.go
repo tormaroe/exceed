@@ -1,11 +1,21 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 
 	"github.com/akamensky/argparse"
+	"github.com/tormaroe/exceed/picol"
 )
+
+func commandPuts(i *picol.Interp, argv []string, pd interface{}) (string, error) {
+	if len(argv) != 2 {
+		return "", fmt.Errorf("Wrong number of args for %s %s", argv[0], argv)
+	}
+	fmt.Println(argv[1])
+	return "", nil
+}
 
 func main() {
 	parser := argparse.NewParser("exceed", "Manipulates Excel spreadsheet using a DSL")
@@ -26,4 +36,28 @@ func main() {
 	fmt.Println("Script path: ", *scriptPath)
 	fmt.Println("Eval script: ", *evalScript)
 	fmt.Println("Interactive: ", *interactive)
+
+	interp := picol.InitInterp()
+	interp.RegisterCoreCommands()
+	interp.RegisterCommand("puts", commandPuts, nil)
+
+	result, err := interp.Eval(*evalScript)
+	if err != nil {
+		fmt.Println("ERROR", result, err)
+	}
+
+	if *interactive {
+		// TODO: Print header
+		for {
+			fmt.Print("exceed> ")
+			scanner := bufio.NewReader(os.Stdin)
+			clibuf, _ := scanner.ReadString('\n')
+			result, err := interp.Eval(clibuf[:len(clibuf)-1])
+			if err != nil {
+				fmt.Println("ERROR", result, err)
+			}
+		}
+	}
+
+	// TODO: Save
 }
