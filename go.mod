@@ -2,4 +2,7 @@ module github.com/tormaroe/exceed
 
 go 1.13
 
-require github.com/360EntSecGroup-Skylar/excelize/v2 v2.2.0 // indirect
+require (
+	github.com/360EntSecGroup-Skylar/excelize/v2 v2.2.0 // indirect
+	github.com/akamensky/argparse v1.2.1
+)
